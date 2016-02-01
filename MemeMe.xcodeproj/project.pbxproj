@@ -8,20 +8,22 @@
 
 /* Begin PBXBuildFile section */
 		F4361D411C5E9D7100A7CC26 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4361D401C5E9D7100A7CC26 /* AppDelegate.swift */; };
-		F4361D431C5E9D7100A7CC26 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4361D421C5E9D7100A7CC26 /* ViewController.swift */; };
+		F4361D431C5E9D7100A7CC26 /* MemeEditorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4361D421C5E9D7100A7CC26 /* MemeEditorViewController.swift */; };
 		F4361D461C5E9D7100A7CC26 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F4361D441C5E9D7100A7CC26 /* Main.storyboard */; };
 		F4361D481C5E9D7100A7CC26 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F4361D471C5E9D7100A7CC26 /* Assets.xcassets */; };
 		F4361D4B1C5E9D7100A7CC26 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F4361D491C5E9D7100A7CC26 /* LaunchScreen.storyboard */; };
+		F4361D541C5ED55700A7CC26 /* Meme.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4361D531C5ED55700A7CC26 /* Meme.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		F4361D3D1C5E9D7100A7CC26 /* MemeMe.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MemeMe.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F4361D401C5E9D7100A7CC26 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		F4361D421C5E9D7100A7CC26 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		F4361D421C5E9D7100A7CC26 /* MemeEditorViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemeEditorViewController.swift; sourceTree = "<group>"; };
 		F4361D451C5E9D7100A7CC26 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		F4361D471C5E9D7100A7CC26 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		F4361D4A1C5E9D7100A7CC26 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		F4361D4C1C5E9D7100A7CC26 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		F4361D531C5ED55700A7CC26 /* Meme.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Meme.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -54,14 +56,23 @@
 		F4361D3F1C5E9D7100A7CC26 /* MemeMe */ = {
 			isa = PBXGroup;
 			children = (
+				F4361D521C5ED54200A7CC26 /* Model */,
 				F4361D401C5E9D7100A7CC26 /* AppDelegate.swift */,
-				F4361D421C5E9D7100A7CC26 /* ViewController.swift */,
+				F4361D421C5E9D7100A7CC26 /* MemeEditorViewController.swift */,
 				F4361D441C5E9D7100A7CC26 /* Main.storyboard */,
 				F4361D471C5E9D7100A7CC26 /* Assets.xcassets */,
 				F4361D491C5E9D7100A7CC26 /* LaunchScreen.storyboard */,
 				F4361D4C1C5E9D7100A7CC26 /* Info.plist */,
 			);
 			path = MemeMe;
+			sourceTree = "<group>";
+		};
+		F4361D521C5ED54200A7CC26 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				F4361D531C5ED55700A7CC26 /* Meme.swift */,
+			);
+			name = Model;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -135,7 +146,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F4361D431C5E9D7100A7CC26 /* ViewController.swift in Sources */,
+				F4361D541C5ED55700A7CC26 /* Meme.swift in Sources */,
+				F4361D431C5E9D7100A7CC26 /* MemeEditorViewController.swift in Sources */,
 				F4361D411C5E9D7100A7CC26 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -286,6 +298,7 @@
 				F4361D511C5E9D7100A7CC26 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
