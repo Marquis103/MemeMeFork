@@ -48,7 +48,8 @@ class MemeEditorViewController: UIViewController {
     if bottomTextField.isFirstResponder() {
       let userInfo = notification.userInfo
       let keyboardSize = userInfo![UIKeyboardFrameEndUserInfoKey] as! NSValue
-      self.view.frame.origin.y -= keyboardSize.CGRectValue().height
+      
+      view.frame.origin.y -= keyboardSize.CGRectValue().height
     }
     
   }
@@ -57,6 +58,7 @@ class MemeEditorViewController: UIViewController {
     if bottomTextField.isFirstResponder() {
       let userInfo = notification.userInfo
       let keyboardSize = userInfo![UIKeyboardFrameEndUserInfoKey] as! NSValue
+      
       view.frame.origin.y += keyboardSize.CGRectValue().height
     }
   }
@@ -121,7 +123,7 @@ class MemeEditorViewController: UIViewController {
     let picker = UIImagePickerController()
     picker.delegate = self
     picker.sourceType = .PhotoLibrary
-    self.presentViewController(picker, animated: true, completion: nil)
+    presentViewController(picker, animated: true, completion: nil)
   }
 
   @IBAction func shareImage(sender: UIBarButtonItem) {
@@ -137,7 +139,7 @@ class MemeEditorViewController: UIViewController {
     
     camera.sourceType = .Camera
     
-    self.presentViewController(camera, animated: true, completion: nil)
+    presentViewController(camera, animated: true, completion: nil)
   }
 }
 
@@ -156,11 +158,11 @@ extension MemeEditorViewController: UIImagePickerControllerDelegate, UINavigatio
       shareButton.enabled = (imageView.image != nil)
     }
     
-    self.dismissViewControllerAnimated(true, completion: nil)
+    dismissViewControllerAnimated(true, completion: nil)
   }
   
   func imagePickerControllerDidCancel(picker: UIImagePickerController) {
-    self.dismissViewControllerAnimated(true, completion: nil)
+    dismissViewControllerAnimated(true, completion: nil)
   }
 }
 
