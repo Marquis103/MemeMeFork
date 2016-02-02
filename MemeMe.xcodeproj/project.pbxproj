@@ -58,8 +58,8 @@
 			children = (
 				F4361D521C5ED54200A7CC26 /* Model */,
 				F4361D401C5E9D7100A7CC26 /* AppDelegate.swift */,
-				F4361D421C5E9D7100A7CC26 /* MemeEditorViewController.swift */,
 				F4361D441C5E9D7100A7CC26 /* Main.storyboard */,
+				F4361D421C5E9D7100A7CC26 /* MemeEditorViewController.swift */,
 				F4361D471C5E9D7100A7CC26 /* Assets.xcassets */,
 				F4361D491C5E9D7100A7CC26 /* LaunchScreen.storyboard */,
 				F4361D4C1C5E9D7100A7CC26 /* Info.plist */,
