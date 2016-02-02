@@ -58,9 +58,10 @@ class MemeEditorViewController: UIViewController {
 	
 	func keyboardWillHide(notification:NSNotification) {
 		if bottomTextField.isFirstResponder() {
-			let userInfo = notification.userInfo
-			let keyboardSize = userInfo![UIKeyboardFrameEndUserInfoKey] as! NSValue
-			view.frame.origin.y += keyboardSize.CGRectValue().height
+			view.frame.origin.y = 0
+//			let userInfo = notification.userInfo
+//			let keyboardSize = userInfo![UIKeyboardFrameEndUserInfoKey] as! NSValue
+//			view.frame.origin.y += keyboardSize.CGRectValue().height
 			
 			isLastNotificationKeyboardShow = false
 		}
@@ -101,6 +102,8 @@ class MemeEditorViewController: UIViewController {
 	}
 	
 	override func viewWillAppear(animated: Bool) {
+		super.viewWillAppear(true)
+		
 		//subscribe to keyboard will show notification
 		NSNotificationCenter.defaultCenter().addObserver(self, selector: "keyboardWillShow:", name: UIKeyboardWillShowNotification, object: nil)
 		NSNotificationCenter.defaultCenter().addObserver(self, selector: "keyboardWillHide:", name: UIKeyboardWillHideNotification, object: nil)
@@ -111,6 +114,8 @@ class MemeEditorViewController: UIViewController {
 	}
 	
 	override func viewWillDisappear(animated: Bool) {
+		super.viewWillDisappear(true)
+		
 		NSNotificationCenter.defaultCenter().removeObserver(self)
 	}
 	
@@ -135,9 +140,19 @@ class MemeEditorViewController: UIViewController {
 	}
 	
 	@IBAction func shareImage(sender: UIBarButtonItem) {
-		meme = Meme(topText: topTextField.text ?? "", bottomText: bottomTextField.text ?? "", originalImage: imageView.image!, memedImage: generateMemedImage())
+
+		let memedImage = generateMemedImage()
 		
-		let activityView = UIActivityViewController(activityItems: [(meme?.memedImage)!], applicationActivities: nil)
+		let activityView = UIActivityViewController(activityItems: [memedImage], applicationActivities: nil)
+		activityView.completionWithItemsHandler = {(activityType:String?, completed:Bool, returnedItems:[AnyObject]?, error:NSError?) in
+			if !completed {
+				return
+			}
+			
+			//save meme
+			self.meme = Meme(topText: self.topTextField.text ?? "", bottomText: self.bottomTextField.text ?? "", originalImage: self.imageView.image!, memedImage: memedImage)
+		}
+		
 		presentViewController(activityView, animated: true, completion: nil)
 		
 	}
@@ -185,5 +200,11 @@ extension MemeEditorViewController : UITextFieldDelegate {
 	func textFieldShouldReturn(textField: UITextField) -> Bool {
 		textField.resignFirstResponder()
 		return true
+	}
+	
+	func textFieldDidEndEditing(textField: UITextField) {
+		if let text = textField.text {
+			textField.text = text.uppercaseString
+		}
 	}
 }
