@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import CoreData
 
 class MemeEditorViewController: UIViewController {
 	
@@ -20,7 +21,7 @@ class MemeEditorViewController: UIViewController {
 	@IBOutlet weak var shareButton: UIBarButtonItem!
 	
 	var deviceOrientation:UIDeviceOrientation?
-	
+
 	//variable is used to work around an issue where UIKeyboardWillShow notification is fired multiple times in a row
 	var isLastNotificationKeyboardShow:Bool = false
 	
@@ -59,9 +60,6 @@ class MemeEditorViewController: UIViewController {
 	func keyboardWillHide(notification:NSNotification) {
 		if bottomTextField.isFirstResponder() {
 			view.frame.origin.y = 0
-//			let userInfo = notification.userInfo
-//			let keyboardSize = userInfo![UIKeyboardFrameEndUserInfoKey] as! NSValue
-//			view.frame.origin.y += keyboardSize.CGRectValue().height
 			
 			isLastNotificationKeyboardShow = false
 		}
@@ -150,7 +148,8 @@ class MemeEditorViewController: UIViewController {
 			}
 			
 			//save meme
-			self.meme = Meme(topText: self.topTextField.text ?? "", bottomText: self.bottomTextField.text ?? "", originalImage: self.imageView.image!, memedImage: memedImage)
+			//self.meme = NSMa
+			//self.meme = Meme(topText: self.topTextField.text ?? "", bottomText: self.bottomTextField.text ?? "", originalImage: self.imageView.image!, memedImage: memedImage)
 		}
 		
 		presentViewController(activityView, animated: true, completion: nil)

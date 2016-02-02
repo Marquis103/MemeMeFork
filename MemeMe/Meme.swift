@@ -2,15 +2,14 @@
 //  Meme.swift
 //  MemeMe
 //
-//  Created by Marquis Dennis on 1/31/16.
+//  Created by Marquis Dennis on 2/2/16.
 //  Copyright © 2016 Marquis Dennis. All rights reserved.
 //
 
-import UIKit
+import Foundation
+import CoreData
 
-struct Meme {
-	var topText:String
-	var bottomText:String
-	var originalImage:UIImage
-	var memedImage:UIImage
+
+class Meme: NSManagedObject {
+
 }
