@@ -14,9 +14,10 @@ import CoreData
 
 extension Meme {
 
-    @NSManaged var topText: String?
     @NSManaged var bottomText: String?
-    @NSManaged var originalImage: UIImage
     @NSManaged var memedImage: UIImage
+    @NSManaged var originalImage: UIImage
+    @NSManaged var topText: String?
+    @NSManaged var memedImageIcon: UIImage
 
 }

@@ -20,8 +20,12 @@ class MemeEditorViewController: UIViewController {
 	@IBOutlet weak var navigationBar: UINavigationBar!
 	@IBOutlet weak var shareButton: UIBarButtonItem!
 	
+	//core datastack implementation
 	lazy var coreDataStack = CoreDataStack()
-
+	
+	//CGSize is used to create a meme icon image for tableview and colletionview cells
+	var imageIconSize = CGSize(width: 90, height: 90)
+	
 	//variable is used to work around an issue where UIKeyboardWillShow notification is fired multiple times in a row
 	var isLastNotificationKeyboardShow:Bool = false
 	
@@ -61,7 +65,6 @@ class MemeEditorViewController: UIViewController {
 			
 			isLastNotificationKeyboardShow = false
 		}
-		
 	}
 	
 	func setUpTextFields() {
@@ -126,6 +129,8 @@ class MemeEditorViewController: UIViewController {
 		topTextField.text = "TOP"
 		bottomTextField.text = "BOTTOM"
 		shareButton.enabled = false
+		
+		self.dismissViewControllerAnimated(true, completion: nil)
 	}
 	
 	@IBAction func pickAnImage(sender: AnyObject) {
@@ -151,6 +156,7 @@ class MemeEditorViewController: UIViewController {
 			meme.bottomText = self.bottomTextField.text ?? ""
 			meme.originalImage = self.imageView.image!
 			meme.memedImage = memedImage
+			meme.memedImageIcon = UIImage.resizeImage(memedImage, newSize: self.imageIconSize)
 			
 			self.coreDataStack.saveMainContext()
 			
@@ -210,5 +216,32 @@ extension MemeEditorViewController : UITextFieldDelegate {
 		if let text = textField.text {
 			textField.text = text.uppercaseString
 		}
+	}
+}
+
+extension UIImage {
+	static func resizeImage(image: UIImage, newSize: CGSize) -> (UIImage) {
+		let newRect = CGRectIntegral(CGRectMake(0,0, newSize.width, newSize.height))
+		let imageRef = image.CGImage
+		
+		UIGraphicsBeginImageContextWithOptions(newSize, false, 0)
+		let context = UIGraphicsGetCurrentContext()
+		
+		// Set the quality level to use when rescaling
+		CGContextSetInterpolationQuality(context, CGInterpolationQuality.High)
+		let flipVertical = CGAffineTransform(a: 1, b: 0, c: 0, d: -1, tx: 0, ty: newSize.height)
+		
+		CGContextConcatCTM(context, flipVertical)
+		
+		// Draw into the context; this scales the image
+		CGContextDrawImage(context, newRect, imageRef)
+		
+		let newImageRef = CGBitmapContextCreateImage(context)!// as CGImage
+		let newImage = UIImage(CGImage: newImageRef)
+		
+		// Get the resized image from the context and a UIImage
+		UIGraphicsEndImageContext()
+		
+		return newImage
 	}
 }

@@ -20,19 +20,17 @@ class MemeTableViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        // Uncomment the following line to preserve selection between presentations
-        // self.clearsSelectionOnViewWillAppear = false
-
-        // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .Add, target: self, action: "addMeme")
+		
+		navigationItem.leftBarButtonItem = editButtonItem()
     }
 	
 	override func viewWillAppear(animated: Bool) {
 		super.viewWillAppear(animated)
 		
-		//deleteData()
-		
 		reloadData()
+		
+		navigationItem.leftBarButtonItem?.enabled = (memes.count > 0)
 	}
 
     override func didReceiveMemoryWarning() {
@@ -40,36 +38,20 @@ class MemeTableViewController: UITableViewController {
         // Dispose of any resources that can be recreated.
     }
 	
-	
-	//MARK: Functions
-	func deleteData() {
-		let memeFetchRequest = NSFetchRequest(entityName: "Meme")
-		let memeDeleteRequest = NSBatchDeleteRequest(fetchRequest: memeFetchRequest)
-		memeDeleteRequest.resultType = .ResultTypeCount
-		
-		do {
-			let memeResult = try coreDataStack.managedObjectContext.executeRequest(memeDeleteRequest) as! NSBatchDeleteResult
-			
-			let alert = UIAlertController(title: "Batch Delete Succeeded", message: "\(memeResult.result!) meme records deleted.", preferredStyle: .Alert)
-			alert.addAction(UIAlertAction(title: "OK", style: .Cancel, handler: nil))
-			presentViewController(alert, animated: true, completion: nil)
-		} catch {
-			let alert = UIAlertController(title: "Batch Delete Failed", message: "There was an error with the batch delete.", preferredStyle: .Alert)
-			alert.addAction(UIAlertAction(title: "OK", style: .Cancel, handler: nil))
-			presentViewController(alert, animated: true, completion: nil)
+	override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+		if segue.identifier == "showMeme" {
+			let destinationVC = segue.destinationViewController as! MemeViewController
+			destinationVC.meme = sender as? Meme
 		}
 	}
-	func resizeImageForViews(image: UIImage, newWidth:CGFloat) -> UIImage {
-		//let scale = newWidth/image.size.width
-		//let newHeight = image.size.height * scale
-		UIGraphicsBeginImageContext(CGSizeMake(150, 150))
-		let context = UIGraphicsGetCurrentContext()
-		CGContextSetInterpolationQuality(context, .High)
-		image.drawInRect(CGRect(x: 0, y: 0, width: 150, height: 150))
-		let newImage = UIGraphicsGetImageFromCurrentImageContext()
-		UIGraphicsEndImageContext()
+	
+	//MARK: Functions
+	func deleteMemeObject(meme: Meme) {
+		coreDataStack.managedObjectContext.deleteObject(meme)
 		
-		return newImage
+		coreDataStack.saveMainContext()
+		
+		reloadData()
 	}
 	
 	func reloadData() {
@@ -78,7 +60,6 @@ class MemeTableViewController: UITableViewController {
 		do {
 			if let results = try coreDataStack.managedObjectContext.executeFetchRequest(fetchRequest) as? [Meme] {
 				memes = results
-				//coreDataStack.managedObjectContext.deletedObjects(Set(memes))
 			}
 			
 		} catch {
@@ -93,38 +74,58 @@ class MemeTableViewController: UITableViewController {
 	}
 
     // MARK: - Table view data source
-
+	override func setEditing(editing: Bool, animated: Bool) {
+		super.setEditing(editing, animated: animated)
+		if editing {
+			tableView.setEditing(true, animated: animated)
+		} else {
+			tableView.setEditing(false, animated: animated)
+		}
+	}
     override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
         return 1
     }
 
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return memes.count
+        return memes.count ?? 0
     }
-	
-	
-
 	
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier(reuseIdentifier, forIndexPath: indexPath) as! MemeTableViewCell
 
 		let meme = memes[indexPath.row]
 		
-		cell.memeImage.image = meme.memedImage
+		cell.memeImage.image = meme.memedImageIcon
 		
 		let topText = meme.topText ?? ""
 		let bottomText = meme.bottomText ?? ""
 		
 		var text = [String]()
-		text.append((topText.characters.count < 8 && topText.characters.count > 0) ? topText : (topText as NSString).substringFromIndex(8))
+		text.append((topText.characters.count < 10 && topText.characters.count >= 0) ? topText : (topText as NSString).substringToIndex(10))
 		text.append((topText != String.Empty() && bottomText != String.Empty()) ? "..." : "")
-		text.append((bottomText.characters.count < 8 && bottomText.characters.count > 0) ? bottomText : (bottomText as NSString).substringFromIndex(8))
+		text.append((bottomText.characters.count < 10 && bottomText.characters.count >= 0) ? bottomText : (bottomText as NSString).substringToIndex(10))
 		
 		cell.memeTextLabel.text = (text.count > 0) ? text.joinWithSeparator("") : ""
+		cell.memeTextLabel.textAlignment = .Center
 
         return cell
     }
 	
+	override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
+		if editingStyle == .Delete {
+			let meme = memes[indexPath.row]
+			memes.removeAtIndex(indexPath.row)
+			tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
+			deleteMemeObject(meme)
+		}
+	}
+	
+	override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+		let meme = memes[indexPath.row]
+		
+		performSegueWithIdentifier("showMeme", sender: meme)
+		
+	}
 
     /*
     // Override to support conditional editing of the table view.
@@ -134,17 +135,10 @@ class MemeTableViewController: UITableViewController {
     }
     */
 
-    /*
+	
     // Override to support editing the table view.
-    override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
-        if editingStyle == .Delete {
-            // Delete the row from the data source
-            tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
-        } else if editingStyle == .Insert {
-            // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-        }    
-    }
-    */
+	
+	
 
     /*
     // Override to support rearranging the table view.
