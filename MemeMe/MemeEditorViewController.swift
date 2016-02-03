@@ -130,7 +130,7 @@ class MemeEditorViewController: UIViewController {
 		bottomTextField.text = "BOTTOM"
 		shareButton.enabled = false
 		
-		self.dismissViewControllerAnimated(true, completion: nil)
+		dismissViewControllerAnimated(true, completion: nil)
 	}
 	
 	@IBAction func pickAnImage(sender: AnyObject) {
@@ -186,8 +186,9 @@ extension String {
 extension MemeEditorViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
 	func imagePickerController(picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : AnyObject]) {
 		if let image = info[UIImagePickerControllerOriginalImage] as? UIImage {
+			imageView.contentMode = .ScaleAspectFill
 			imageView.image = image
-			imageView.contentMode = .ScaleToFill
+
 			
 			shareButton.enabled = (imageView.image != nil)
 		}

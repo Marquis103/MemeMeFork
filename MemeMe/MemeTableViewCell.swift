@@ -21,14 +21,5 @@ class MemeTableViewCell: UITableViewCell {
 
     override func setSelected(selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
-
-        // Configure the view for the selected state
     }
-
-	override func layoutSubviews() {
-		super.layoutSubviews()
-		memeTextLabel.contentMode = UIViewContentMode.Left
-		//memeImage.image.image
-//		self.memeImage.bounds = CGRect(x: 0, y: 0, width: 100, height: 100)
-	}
 }
