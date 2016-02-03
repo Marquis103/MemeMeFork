@@ -9,14 +9,14 @@
 //  to delete and recreate this implementation file for your updated model.
 //
 
-import Foundation
+import UIKit
 import CoreData
 
 extension Meme {
 
     @NSManaged var topText: String?
     @NSManaged var bottomText: String?
-    @NSManaged var originalImage: NSObject
-    @NSManaged var memedImage: NSObject
+    @NSManaged var originalImage: UIImage
+    @NSManaged var memedImage: UIImage
 
 }

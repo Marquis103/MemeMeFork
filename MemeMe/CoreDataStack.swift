@@ -9,7 +9,7 @@
 import Foundation
 import CoreData
 
-class CoreDataStack {
+class CoreDataStack : NSObject {
 	static let moduleName = "myMemes"
 	
 	//save managed context if changes exist
@@ -57,5 +57,13 @@ class CoreDataStack {
 		let managedObjectContext = NSManagedObjectContext(concurrencyType: .MainQueueConcurrencyType)
 		managedObjectContext.persistentStoreCoordinator = self.persistentStoreCoordinator
 		return managedObjectContext
+	}()
+	
+	lazy var memeEntity:NSEntityDescription = {
+		guard let entity = NSEntityDescription.entityForName("Meme", inManagedObjectContext: self.managedObjectContext) else {
+			fatalError("Entity could not be found!")
+		}
+		
+		return entity
 	}()
 }

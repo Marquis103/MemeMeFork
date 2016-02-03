@@ -12,10 +12,21 @@ import UIKit
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
   var window: UIWindow?
-
+  lazy var coreDataStack = CoreDataStack()
 
   func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
-    // Override point for customization after application launch.
+	
+	//pass the coreDataStack object to the viewControllers
+	if let tab = window?.rootViewController as? UITabBarController {
+		for childViewController in tab.viewControllers ?? [] {
+			if let childViewController = childViewController as? UINavigationController, top = childViewController.topViewController {
+				if top.respondsToSelector("setCoreDataStack:") {
+					top.performSelector("setCoreDataStack:", withObject: coreDataStack)
+				}
+			}
+		}
+	}
+	
     return true
   }
 

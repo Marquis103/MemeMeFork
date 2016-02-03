@@ -20,12 +20,10 @@ class MemeEditorViewController: UIViewController {
 	@IBOutlet weak var navigationBar: UINavigationBar!
 	@IBOutlet weak var shareButton: UIBarButtonItem!
 	
-	var deviceOrientation:UIDeviceOrientation?
+	lazy var coreDataStack = CoreDataStack()
 
 	//variable is used to work around an issue where UIKeyboardWillShow notification is fired multiple times in a row
 	var isLastNotificationKeyboardShow:Bool = false
-	
-	var meme:Meme?
 	
 	let memeTextAttributes = [
 		NSStrokeColorAttributeName : UIColor.blackColor(),
@@ -144,12 +142,19 @@ class MemeEditorViewController: UIViewController {
 		let activityView = UIActivityViewController(activityItems: [memedImage], applicationActivities: nil)
 		activityView.completionWithItemsHandler = {(activityType:String?, completed:Bool, returnedItems:[AnyObject]?, error:NSError?) in
 			if !completed {
-				return
+				self.dismissViewControllerAnimated(true, completion: nil)
 			}
 			
 			//save meme
-			//self.meme = NSMa
-			//self.meme = Meme(topText: self.topTextField.text ?? "", bottomText: self.bottomTextField.text ?? "", originalImage: self.imageView.image!, memedImage: memedImage)
+			let meme = Meme(entity: self.coreDataStack.memeEntity, insertIntoManagedObjectContext: self.coreDataStack.managedObjectContext)
+			meme.topText = self.topTextField.text ?? ""
+			meme.bottomText = self.bottomTextField.text ?? ""
+			meme.originalImage = self.imageView.image!
+			meme.memedImage = memedImage
+			
+			self.coreDataStack.saveMainContext()
+			
+			self.dismissViewControllerAnimated(true, completion: nil)
 		}
 		
 		presentViewController(activityView, animated: true, completion: nil)
