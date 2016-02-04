@@ -8,6 +8,7 @@
 
 import UIKit
 import CoreData
+import AVFoundation
 
 class MemeEditorViewController: UIViewController {
 	
@@ -19,6 +20,12 @@ class MemeEditorViewController: UIViewController {
 	@IBOutlet weak var toolbar: UIToolbar!
 	@IBOutlet weak var navigationBar: UINavigationBar!
 	@IBOutlet weak var shareButton: UIBarButtonItem!
+	
+	var topTextFieldNSConstraint:NSLayoutConstraint!
+	var bottomTextFieldNSConstraint:NSLayoutConstraint!
+	
+	var imageSize:CGSize!
+	var imageFrame:CGRect!
 	
 	//core datastack implementation
 	lazy var coreDataStack = CoreDataStack()
@@ -36,12 +43,38 @@ class MemeEditorViewController: UIViewController {
 		NSStrokeWidthAttributeName : -3.0
 	]
 	
-	struct KeyboardLayOut {
-		static var keyboardOrientation:UIDeviceOrientation?
-		static var keyboardHeight:CGFloat?
+	//MARK: Functions
+	override func viewDidLayoutSubviews() {
+
+		super.viewDidLayoutSubviews()
+		
+		layoutTextFields()
 	}
 	
-	//MARK: Functions
+	func layoutTextFields() {
+		if let topTextFieldNSConstraint = topTextFieldNSConstraint {
+			view.removeConstraint(topTextFieldNSConstraint)
+		}
+		
+		if let bottomTextFieldNSConstraint = bottomTextFieldNSConstraint {
+			view.removeConstraint(bottomTextFieldNSConstraint)
+		}
+		
+		//get psotion of the image after aspect ratio
+		if let selectedImage = imageView.image {
+			imageSize = selectedImage.size ?? imageView.frame.size
+			imageFrame = AVMakeRectWithAspectRatioInsideRect(imageSize, imageView.bounds)
+			
+			let margin = imageFrame.origin.y + imageFrame.size.height * 0.10
+			
+			topTextFieldNSConstraint = NSLayoutConstraint(item: topTextField, attribute: .Top, relatedBy: .Equal, toItem: imageView, attribute: .Top, multiplier: 1, constant: margin)
+			view.addConstraint(topTextFieldNSConstraint)
+			
+			bottomTextFieldNSConstraint = NSLayoutConstraint(item: bottomTextField, attribute: .Bottom, relatedBy: .Equal, toItem: imageView, attribute: .Bottom, multiplier: 1, constant: -margin)
+			view.addConstraint(bottomTextFieldNSConstraint)
+			
+		}
+	}
 	override func viewDidLoad() {
 		super.viewDidLoad()
 		
@@ -78,26 +111,47 @@ class MemeEditorViewController: UIViewController {
 		topTextField.text = "TOP"
 		bottomTextField.text = "BOTTOM"
 		
+		topTextField.hidden = true
+		bottomTextField.hidden = true
+		
 		topTextField.delegate = self
 		bottomTextField.delegate = self
 		
 	}
 	
-	func generateMemedImage() -> UIImage {
+	func generateMemedImage() -> UIImage? {
 		
 		toolbar.hidden = true
 		navigationBar.hidden = true
 		
 		// Render view to an image
-		UIGraphicsBeginImageContext(self.view.frame.size)
-		view.drawViewHierarchyInRect(self.view.frame, afterScreenUpdates: true)
-		let memedImage : UIImage = UIGraphicsGetImageFromCurrentImageContext()
-		UIGraphicsEndImageContext()
+		if let _ = imageView.image {
+			UIGraphicsBeginImageContext(imageFrame.size)
+			
+			view.drawViewHierarchyInRect(CGRect(x: -imageFrame.origin.x, y: -imageFrame.origin.y, width: imageView.bounds.width, height: imageView.bounds.height), afterScreenUpdates: true)
+			
+			let memedImage: UIImage = UIGraphicsGetImageFromCurrentImageContext()
+			UIGraphicsEndImageContext()
+			
+			return memedImage
+		}
 		
 		navigationBar.hidden = false
 		toolbar.hidden = false
 		
-		return memedImage
+		return nil
+	}
+	
+	func saveModel(meme: Meme) {
+		let memeModel = MemeModel(entity: coreDataStack.memeEntity, insertIntoManagedObjectContext: coreDataStack.managedObjectContext)
+		
+		memeModel.topText = meme.topText
+		memeModel.bottomText = meme.bottomText
+		memeModel.originalImage = meme.originalImage
+		memeModel.memedImage = meme.memedImage
+		memeModel.memedImageIcon = UIImage.resizeImage(meme.memedImage, newSize: imageIconSize)
+		
+		coreDataStack.saveMainContext()
 	}
 	
 	override func viewWillAppear(animated: Bool) {
@@ -130,6 +184,9 @@ class MemeEditorViewController: UIViewController {
 		bottomTextField.text = "BOTTOM"
 		shareButton.enabled = false
 		
+		topTextField.hidden = false
+		bottomTextField.hidden = false
+		
 		dismissViewControllerAnimated(true, completion: nil)
 	}
 	
@@ -144,27 +201,28 @@ class MemeEditorViewController: UIViewController {
 
 		let memedImage = generateMemedImage()
 		
-		let activityView = UIActivityViewController(activityItems: [memedImage], applicationActivities: nil)
-		activityView.completionWithItemsHandler = {(activityType:String?, completed:Bool, returnedItems:[AnyObject]?, error:NSError?) in
-			if !completed {
+		if let memedImage = memedImage {
+			let activityView = UIActivityViewController(activityItems: [memedImage], applicationActivities: nil)
+			activityView.completionWithItemsHandler = {(activityType:String?, completed:Bool, returnedItems:[AnyObject]?, error:NSError?) in
+				if !completed {
+					self.dismissViewControllerAnimated(true, completion: nil)
+				}
+				
+				//save meme
+				let meme = Meme(topText: self.topTextField.text ?? "", bottomText: self.bottomTextField.text ?? "", originalImage: self.imageView.image!, memedImage: memedImage)
+				self.saveModel(meme)
+				
 				self.dismissViewControllerAnimated(true, completion: nil)
 			}
 			
-			//save meme
-			let meme = Meme(entity: self.coreDataStack.memeEntity, insertIntoManagedObjectContext: self.coreDataStack.managedObjectContext)
-			meme.topText = self.topTextField.text ?? ""
-			meme.bottomText = self.bottomTextField.text ?? ""
-			meme.originalImage = self.imageView.image!
-			meme.memedImage = memedImage
-			meme.memedImageIcon = UIImage.resizeImage(memedImage, newSize: self.imageIconSize)
+			presentViewController(activityView, animated: true, completion: nil)
+		} else {
+			let alertController = UIAlertController(title: "Meme Error", message: "Could not generate meme image!", preferredStyle: .Alert)
+			let alertAction = UIAlertAction(title: "OK'", style: .Default, handler: nil)
+			alertController.addAction(alertAction)
 			
-			self.coreDataStack.saveMainContext()
-			
-			self.dismissViewControllerAnimated(true, completion: nil)
+			presentViewController(alertController, animated: true, completion: nil)
 		}
-		
-		presentViewController(activityView, animated: true, completion: nil)
-		
 	}
 	
 	@IBAction func useCamera(sender: UIBarButtonItem) {
@@ -186,9 +244,11 @@ extension String {
 extension MemeEditorViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
 	func imagePickerController(picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : AnyObject]) {
 		if let image = info[UIImagePickerControllerOriginalImage] as? UIImage {
-			imageView.contentMode = .ScaleAspectFill
+			imageView.contentMode = .ScaleAspectFit
 			imageView.image = image
-
+			
+			topTextField.hidden = false
+			bottomTextField.hidden = false
 			
 			shareButton.enabled = (imageView.image != nil)
 		}

@@ -13,7 +13,7 @@ import CoreData
 class MemeCollectionViewController: UICollectionViewController {
 	var coreDataStack: CoreDataStack!
 	
-	var memes = [Meme]()
+	var memes = [MemeModel]()
 
 	private let reuseIdentifier = "collectionViewCell"
 	
@@ -41,10 +41,10 @@ class MemeCollectionViewController: UICollectionViewController {
 	}
 	
 	func reloadData() {
-		let fetchRequest = NSFetchRequest(entityName: "Meme")
+		let fetchRequest = NSFetchRequest(entityName: "MemeModel")
 		
 		do {
-			if let results = try coreDataStack.managedObjectContext.executeFetchRequest(fetchRequest) as? [Meme] {
+			if let results = try coreDataStack.managedObjectContext.executeFetchRequest(fetchRequest) as? [MemeModel] {
 				memes = results
 			}
 			
@@ -67,7 +67,7 @@ class MemeCollectionViewController: UICollectionViewController {
 	override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
 		if segue.identifier == "showMeme" {
 			let destinationVC = segue.destinationViewController as! MemeViewController
-			destinationVC.meme = sender as? Meme
+			destinationVC.meme = sender as? MemeModel
 		}
 	}
 

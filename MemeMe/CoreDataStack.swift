@@ -60,7 +60,7 @@ class CoreDataStack : NSObject {
 	}()
 	
 	lazy var memeEntity:NSEntityDescription = {
-		guard let entity = NSEntityDescription.entityForName("Meme", inManagedObjectContext: self.managedObjectContext) else {
+		guard let entity = NSEntityDescription.entityForName("MemeModel", inManagedObjectContext: self.managedObjectContext) else {
 			fatalError("Entity could not be found!")
 		}
 		

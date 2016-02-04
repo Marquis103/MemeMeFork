@@ -14,7 +14,7 @@ class MemeTableViewController: UITableViewController {
 	private let reuseIdentifier = "memeTableCell"
 	
 	
-    var memes = [Meme]()
+    var memes = [MemeModel]()
 	
 	//MARK: ViewController Methods
     override func viewDidLoad() {
@@ -40,12 +40,12 @@ class MemeTableViewController: UITableViewController {
 	override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
 		if segue.identifier == "showMeme" {
 			let destinationVC = segue.destinationViewController as! MemeViewController
-			destinationVC.meme = sender as? Meme
+			destinationVC.meme = sender as? MemeModel
 		}
 	}
 	
 	//MARK: Functions
-	func deleteMemeObject(meme: Meme) {
+	func deleteMemeObject(meme: MemeModel) {
 		coreDataStack.managedObjectContext.deleteObject(meme)
 		
 		coreDataStack.saveMainContext()
@@ -54,10 +54,10 @@ class MemeTableViewController: UITableViewController {
 	}
 	
 	func reloadData() {
-		let fetchRequest = NSFetchRequest(entityName: "Meme")
+		let fetchRequest = NSFetchRequest(entityName: "MemeModel")
 		
 		do {
-			if let results = try coreDataStack.managedObjectContext.executeFetchRequest(fetchRequest) as? [Meme] {
+			if let results = try coreDataStack.managedObjectContext.executeFetchRequest(fetchRequest) as? [MemeModel] {
 				memes = results
 			}
 			
